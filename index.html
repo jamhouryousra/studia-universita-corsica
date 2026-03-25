@@ -353,14 +353,13 @@
         // ============================================================
         const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbx2rh1liWVuaSJ_BoQfx8xSL8kiPM-ISaAqK9_1FCbFGw09gOqrrYWHOwvb5g0cFoVf/exec';
 
-        // Envoyer les donnees au Google Sheets
+        // Envoyer les donnees au Google Sheets via GET (compatible CORS)
         function sendToSheet(data) {
-            fetch(WEBHOOK_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            }).catch(function() {});
+            var params = Object.keys(data).map(function(key) {
+                return encodeURIComponent(key) + '=' + encodeURIComponent(data[key]);
+            }).join('&');
+            var img = new Image();
+            img.src = WEBHOOK_URL + '?' + params;
         }
 
         // Detecter la source (email ou QR code)
