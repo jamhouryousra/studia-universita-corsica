@@ -215,8 +215,13 @@
             color: white;
         }
 
-        .stat-icon.submissions {
+        .stat-icon.form-email {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .stat-icon.form-qr {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
             color: white;
         }
 
@@ -232,6 +237,11 @@
 
         .stat-icon.total {
             background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .stat-icon.total-forms {
+            background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
             color: white;
         }
 
@@ -347,22 +357,42 @@
             </div>
 
             <div class="stat-card">
-                <div class="stat-icon submissions">
-                    <i class="fas fa-user-check"></i>
-                </div>
-                <div class="stat-content">
-                    <h3 id="totalSubmissions">0</h3>
-                    <p>Formulaire rempli</p>
-                </div>
-            </div>
-
-            <div class="stat-card">
                 <div class="stat-icon qr">
                     <i class="fas fa-qrcode"></i>
                 </div>
                 <div class="stat-content">
                     <h3 id="totalQR">0</h3>
                     <p>Scans du QR Code</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon form-email">
+                    <i class="fas fa-envelope-open-text"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 id="formEmail">0</h3>
+                    <p>Formulaires remplis (Email)</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon form-qr">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 id="formQR">0</h3>
+                    <p>Formulaires remplis (QR Code)</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon total-forms">
+                    <i class="fas fa-user-check"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 id="totalSubmissions">0</h3>
+                    <p>Total formulaires remplis</p>
                 </div>
             </div>
 
@@ -386,22 +416,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- <div class="export-section">
-            <h3><i class="fas fa-download"></i> Exporter les Données</h3>
-            
-            <div class="export-buttons">
-                <button class="btn btn-primary" onclick="exportToJSON()">
-                    <i class="fas fa-file-code"></i> Exporter en JSON
-                </button>
-                <button class="btn btn-success" onclick="exportToCSV()">
-                    <i class="fas fa-file-csv"></i> Exporter en CSV (Excel)
-                </button>
-                <button class="btn btn-danger" onclick="clearAllData()">
-                    <i class="fas fa-trash-alt"></i> Effacer toutes les données
-                </button>
-            </div>
-        </div> -->
 
         <div class="export-section">
             <h3> Gestion des Campagnes</h3>
@@ -443,22 +457,31 @@
 
                     var emailClicks = 0;
                     var qrScans = 0;
-                    var formSubmissions = 0;
+                    var formEmail = 0;
+                    var formQR = 0;
 
                     cachedData.forEach(function(row) {
                         var type = row.Type || row.type || '';
+                        var source = row.Source || row.source || '';
                         if (type === 'email_click') emailClicks++;
                         else if (type === 'qr_scan') qrScans++;
-                        else if (type === 'form_submission') formSubmissions++;
+                        else if (type === 'form_submission') {
+                            if (source === 'qr') formQR++;
+                            else formEmail++;
+                        }
                     });
 
-                    document.getElementById('totalClicks').textContent = emailClicks;
-                    document.getElementById('totalSubmissions').textContent = formSubmissions;
-                    document.getElementById('totalQR').textContent = qrScans;
+                    var totalForms = formEmail + formQR;
+                    var totalVisitors = emailClicks + qrScans;
+                    var clickedOnly = totalVisitors - totalForms;
 
-                    var clickedOnly = emailClicks - formSubmissions;
+                    document.getElementById('totalClicks').textContent = emailClicks;
+                    document.getElementById('totalQR').textContent = qrScans;
+                    document.getElementById('formEmail').textContent = formEmail;
+                    document.getElementById('formQR').textContent = formQR;
+                    document.getElementById('totalSubmissions').textContent = totalForms;
                     document.getElementById('clickedOnly').textContent = clickedOnly > 0 ? clickedOnly : 0;
-                    document.getElementById('totalPiged').textContent = emailClicks + qrScans;
+                    document.getElementById('totalPiged').textContent = totalVisitors;
                 })
                 .catch(function(err) {
                     console.error('Erreur chargement:', err);
